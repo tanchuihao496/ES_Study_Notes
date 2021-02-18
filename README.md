@@ -210,7 +210,27 @@ network.host: 192.168.125.135
 
 ##### 1.7安装中文分词器
 
-下载中文分词器 https://github.com/medcl/elasticsearch-analysis-ik
+(1)下载中文分词器 https://github.com/medcl/elasticsearch-analysis-ik
+
+```
+下载elasticsearch-analysis-ik-master.zip
+```
+
+(2)解压elasticsearch-analysis-ik-master.zip
+
+unzip elasticsearch-analysis-ik-master.zip
+
+(3)进入elasticsearch-analysis-ik-master，编译源码
+
+mvn clean install -Dmaven.test.skip=true
+
+(4)在es的plugins文件夹下创建目录ik
+
+(5)将编译后生成的elasticsearch-analysis-ik-版本.zip移动到ik下，并解压
+
+(6)解压后的内容移动到ik目录下
+
+mv elasticsearch/* ./
 
 
 
@@ -383,9 +403,9 @@ bin/kibana
 
 # 二、第二节ElasticSearch基本操作
 
-##### P7 
+#### P7 
 
-#### 2.1倒排索引
+##### 2.1倒排索引
 
  倒排索引（Inverted Index）也叫反向索引，有反向索引必有正向索引。通俗地来讲，正向索引是通过key找value，反向索引则是通过value找key。 
 
@@ -434,17 +454,17 @@ Elasticsearch分别为每个字段都建立了一个倒排索引。比如，在�
 
 参考：https://www.cnblogs.com/sha0830/p/8000242.html
 
-##### P8
+#### P8
 
-#### 2.1.1使用标准化规则（normalization）:
+##### 2.1.1使用标准化规则（normalization）:
 
 建立倒排索引的时候，会对拆分出的各个单词进行相应的处理，以提升后面搜索的时候能够搜索到相关联的文档的概率
 
 
 
-##### P9
+#### P9
 
-#### 2.1.2分词器介绍及内置分词器
+##### 2.1.2分词器介绍及内置分词器
 
 分词器：从一串文本中切分出一个一个的词条。并对每个词条进行标准化
 
@@ -468,4 +488,74 @@ language分词器：特定语言的分词器，不支持中文。
 
 
 
-#### 2.2使用ElasticSearch API实现CRUD
+#### P10
+
+##### **2.1.3配置中文分词器**
+
+**常用的中文分词器**：
+
+Smart Chinese Analysis: 官方提供的中文分词器,
+
+IKAnalyzer: 免费开源的java分词器,目前比较流行的中文分词器之一,简单,稳定,想要特别好的效果,需要自行维护词库,支持自定义词典
+
+结巴分词 : 开源的python分词器,github有对应的java版本,有自行识别新词的功能,支持自定义词典
+
+Ansj中文分词: 基于n-Gram+CRF+HMM的中文分词的java实现,免费开源,支持应用自然语言处理
+
+hanlp: 免费开源,国人自然处理语言牛人无私风险的
+
+ 个人对以上分词器进行了一个粗略对比 ,如下图: 
+
+![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/smart_chinese_analysis.png)
+
+截止到目前为止 ,他们的分词准确性从高到低依次是:
+
+hanlp> ansj >结巴>IK>Smart Chinese Analysis
+
+结合准确性来看，选用中文分词器基于以下考虑:
+
+官方的 Smart Chinese Analysis直接可以不考虑了
+
+对搜索要求不高的建议选用 IK 学习成本低，使用教程多，还支持远程词典
+
+对新词识别要求高的选用结巴分词
+
+Ansj和hanlp均基于自然处理语言，分词准确度高，活跃度来讲hanlp略胜一筹
+
+
+
+ IKAnalyzer 和 hanlp分词器的使用 
+
+ **IK Analyzer** 
+
+ 截止目前 ,IK分词器插件的优势是支持自定义热更新远程词典。 
+
+安装 ik分词器插件
+
+es插件安装教程参考这里
+
+ik的es插件地址: https://github.com/medcl/elasticsearch-analysis-ik/releases
+
+使用的 es版本是6.4.0，下载时要注意对应es版本
+
+在线安装 ik es插件 命令:
+
+\# /opt/apps/elasticsearch-6.4.0/bin/elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v6.4.0/elasticsearch-analysis-ik-6.4.0.zip
+
+查看插件安装列表
+
+\# sudo /opt/apps/elasticsearch-6.4.0/bin/elasticsearch-plugin list
+
+IK配置
+
+ik安装完毕后配置文件在 {ES_HOME}/config目录下, 本例目录是 /opt/apps/elasticsearch-6.4.0/config/analysis-ik/IKAnalyzer.cfg.xml
+
+![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/IK_config.png)
+
+参考：http://blog.itpub.net/31524777/viewspace-2647360/
+
+
+
+#### P11
+
+##### 2.2使用ElasticSearch API实现CRUD
