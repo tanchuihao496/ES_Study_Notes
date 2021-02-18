@@ -224,7 +224,7 @@ Head是elasticsearch的集群管理工具，可以用于数据的浏览和查询
 
 (3)elasticsearch5.0之后，elasticsearch-head不做为插件放在其plugins目录下了。使用git拷贝elasticsearch-head到本地
 
-1. 编译并安装git :   下载：git-2.17.0.tar.gz
+1.编译并安装git :   下载：git-2.17.0.tar.gz
 
 ```
 
@@ -272,11 +272,19 @@ export PATH=$PATH:/usr/local/git-2.17.0/bin
 
 ```
 
+ ![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/Head_install_cnpm.png) 
 
+**注意上面的安装过程很慢，不要着急；**
 
+查看cnpm版本，如下说明安装成功： [root@cib129 node]#  cnpm -v
 
+ ![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/Head_install_cnpm_test.png) 
 
+3.安装elasticsearch-head
 
+**通过如下命令克隆远程elasticsearch-head到本地/usr/local/下**
 
+[root@cib129 local]# git clone git://github.com/mobz/elasticsearch-head.git
 
+ ![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/Head_install_cnpm_copy.png) 
 
