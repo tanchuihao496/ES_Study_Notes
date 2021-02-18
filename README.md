@@ -50,7 +50,7 @@ GET/PUT/POST/DELETE
 
 ##### 1.3Elasticsearch的架构
 
-![jetbrains://idea/navigate/reference?project=ES_Study_Notes&path=img/ES架构图.png]()
+![../img/ES架构图.png]()
 
 ElasticSearch是基于Lucene开发的分布式搜索框架，包含如下特性：
 
