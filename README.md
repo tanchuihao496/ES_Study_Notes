@@ -210,9 +210,9 @@ network.host: 192.168.125.135
 
 下载中文分词器 https://github.com/medcl/elasticsearch-analysis-ik
 
-##### 
 
-#### P4
+
+#### P5
 
 ##### 1.8安装Head插件
 
@@ -340,3 +340,86 @@ vim app.js
 /usr/local/es/elasticsearch-head/node_modules/grunt/bin/grunt server
 
 如果要后台启动 nohup /usr/local/es/elasticsearch-head/node_modules/grunt/bin/grunt server & exit
+
+####  
+
+#### P6
+
+###### 1.8安装kibana
+
+Kibana是一个针对Elasticsearch的开源分析及可视化平台，使用Kibana可以查询、查看并与存储在ES索引的数据进行交互操作，使用Kibana能执行高级的数据分析，并能以图表、表格和地图的形式查看数据
+
+(1)下载Kibana https://www.elastic.co/downloads/kibana
+
+(2)把下载好的压缩包拷贝到/soft目录下
+
+(3)解压缩，并把解压后的目录移动到/user/local/kibana
+
+(4)编辑kibana配置文件
+
+```
+
+[root@H32 ~]# cd kibana/config/
+[root@H32 config]# vim kibana.yml
+添加：
+server.host: "192.168.80.32"
+elasticsearch.url: "http://192.168.80.32:9200"
+```
+
+先启动ES，然后再启动
+
+```
+cd /usr/local/kibana530
+bin/kibana
+```
+
+ 　kibana必须是在root下运行，否则会报错，启动失败 
+
+
+
+
+
+# 二、第二节ElasticSearch基本操作
+
+##### P7
+
+#### 2.1倒排索引
+
+ 倒排索引（Inverted Index）也叫反向索引，有反向索引必有正向索引。通俗地来讲，正向索引是通过key找value，反向索引则是通过value找key。 
+
+Elasticsearch使用一种称为倒排索引的结构，它适用于快速的全文搜索，一个倒排索引由文档中所有不重复词的列表构成，对于其中每个词，有一个包含它的文档列表。
+
+ 先来回忆一下我们是怎么插入一条索引记录的： 
+
+```
+curl -X PUT "localhost:9200/user/_doc/1" -H 'Content-Type: application/json' -d
+'{
+    "name" : "Jack",
+    "gender" : 1,
+    "age" : 20
+}'
+```
+
+ 其实就是直接PUT一个JSON的对象，这个对象有多个字段，在插入这些数据到索引的同时，Elasticsearch还为这些字段建立索引——倒排索引，因为Elasticsearch最核心功能是搜索。
+
+
+
+[Term Index] ======>  [Term Dictionary] ======> [Postion List]
+
+**Term（单词）**：一段文本经过分析器分析以后就会输出一串单词，这一个一个的就叫做Term（直译为：单词）
+
+**Term Dictionary（单词字典）**：顾名思义，它里面维护的是Term，可以理解为Term的集合
+
+**Term Index（单词索引）**：为了更快的找到某个单词，我们为单词建立索引
+
+**Posting List（倒排列表）**：倒排列表记录了出现过某个单词的所有文档的文档列表及单词在该文档中出现的位置信息，每条记录称为一个倒排项(Posting)。根据倒排列表，即可获知哪些文档包含某个单词。（PS：实际的倒排列表中并不只是存了文档ID这么简单，还有一些其它的信息，比如：词频（Term出现的次数）、偏移量（offset）等，可以想象成是Python中的元组，或者Java中的对象）
+
+ **示例：**
+
+假设有个user索引，它有四个字段：分别是name，gender，age，address。画出来的话，大概是下面这个样子，跟关系型数据库一样 
+
+![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/eg_user_table.png)
+
+上面的例子，Elasticsearch建立的索引大致如下： 
+
+![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/eg_user_index.png)
