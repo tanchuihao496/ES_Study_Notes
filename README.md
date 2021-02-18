@@ -224,67 +224,119 @@ Head是elasticsearch的集群管理工具，可以用于数据的浏览和查询
 
 (3)elasticsearch5.0之后，elasticsearch-head不做为插件放在其plugins目录下了。使用git拷贝elasticsearch-head到本地
 
-1.编译并安装git :   下载：git-2.17.0.tar.gz
+安装步骤：
+
+1、elasticsearch-head是基于nodejs开发的，所以需要安装nodejs环境
+
+2、下载nodejs 安装包
+
+进入nodejs官网
+
+![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/nodejs.png)
+
+右键复制下载链接 https://nodejs.org/dist/v10.13.0/node-v10.13.0-linux-x64.tar.xz
+
+root用户下进入/usr/local/src目录
 
 ```
-
-tar -xvf git-2.17.0.tar.gz
-
-cd git-2.17.0
-
-执行如下命令：编译并指定安装目录进行安装
-
-[root@cib129 git-2.17.0]# ./configure --prefix=/usr/local/git-2.17.0 && make install
-
-[root@cib129 git-2.17.0]# vi /etc/profile  在最后添加如下环境变量：
-
-export PATH=$PATH:/usr/local/git-2.17.0/bin
-
-[root@cib129 git-2.17.0]# source /etc/profile
-
-查看版本号：[root@cib129 git-2.17.0]#  git --version
+cd /usr/local/src
+##下载nodejs安装包
+wget https://nodejs.org/dist/v10.13.0/node-v10.13.0-linux-x64.tar.xz
 ```
 
- 安装成功后删除git的解压目录：[root@cib129 hadoop]# rm -rf git-2.17.0 
-
-2.安装nodejs  下载 （node-v10.0.0-linux-x64.tar.xz） 
+3、安装nodejs 
 
 ```
-[root@cib129 hadoop]# xz -d node-v10.0.0-linux-x64.tar.xz
-
-[root@cib129 hadoop]# tar -xvf node-v10.0.0-linux-x64.tar
-
-[root@cib129 hadoop]# mv node-v10.0.0-linux-x64 /usr/local/node
-
-[root@cib129 node]# vi /etc/profile
-
-在尾部添加export PATH=$PATH:/usr/local/node/bin
-
-[root@cib129 node]# source /etc/profile
-
-查看nodejs的版本： [root@cib129 node]# node -v
-
-查看npm的版本:  [root@cib129 node]# npm -v
-
-安装cnpm:   因为npm安装依赖包太慢（都是国外的），所以使用淘宝的镜像吧，安装cnpm
-
-[root@cib129 node]# npm install -g cnpm --registry=https://registry.npm.taobao.org
-
+##创建nodejs安装目录
+mkdir /usr/local/nodejs
+##解压nodejs安装包到/usr/local/nodejs目录
+tar -xvf node-v10.13.0-linux-x64.tar.xz -C /usr/local/nodejs/
 ```
 
- ![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/Head_install_cnpm.png) 
+4、配置nodejs环境变量 
 
-**注意上面的安装过程很慢，不要着急；**
+ vim /etc/profile 
 
-查看cnpm版本，如下说明安装成功： [root@cib129 node]#  cnpm -v
+```
+##配置nodejs 的HOME目录
+export NODEJS_HOME=/usr/local/nodejs/node-v10.13.0-linux-x64
+##加入nodejs的环境变量
+export PATH=${JAVA_HOME}/bin:${NODEJS_HOME}/bin:$PATH
+```
 
- ![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/Head_install_cnpm_test.png) 
+5、 让修改后的文件立即生效 
 
-3.安装elasticsearch-head
+```
+source /etc/profile
+```
 
-**通过如下命令克隆远程elasticsearch-head到本地/usr/local/下**
+6、 测试nodejs的版本 
 
-[root@cib129 local]# git clone git://github.com/mobz/elasticsearch-head.git
+```
+node -v
+```
 
- ![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/Head_install_copy.png) 
+7、 安装git 用户从github下载elasticsearch-head插件 
 
+```
+yum -y install git
+```
+
+8、 下载elasticsearch-head 
+
+```
+cd /usr/local/es/
+git clone git://github.com/mobz/elasticsearch-head.git
+```
+
+9、 进入到elasticsearch-head目录。进行安装 
+
+ 由于在执行npm install 时候报如下错误 
+
+```
+yum -y install epel-release
+
+cd /usr/local/es/elasticsearch-head
+
+npm install cnpm -g --registry=https://registry.npm.taobao.org
+
+cnpm install -g
+```
+
+10、 修改Gruntfile.js文件 
+
+```
+cd /usr/local/es/elasticsearch-head/
+vim ./Gruntfile.js
+```
+
+![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/vim_Gruntfile.png)
+
+11、 修改elasticsearch-head默认连接地址 
+
+```
+cd /usr/local/es/elasticsearch-head/_site/
+vim app.js
+```
+
+打开文件 在命令行模式输入 “/this.base_uri” 进行搜索
+
+然后修改为
+
+ this.base_uri = this.config.base_uri || this.prefs.get("app-base_uri") || "http://you ip address:9200"; 
+
+![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/vim_base_url.png)
+
+12、 修改elasticsearch服务配置文件允许跨域（在elasticsearch.yml文件中添加） 
+
+![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/vim_slaseticsearch_yml.png)
+
+13、 启动elasticsearch 
+
+ /usr/local/es/node-1/bin/elasticsearch -d 
+
+ 14、启动elasticsearch-head服务 
+
+/usr/local/es/elasticsearch-head/node_modules/grunt/bin/grunt server
+
+如果要后台启动 nohup /usr/local/es/elasticsearch-head/node_modules/grunt/bin/grunt server & exit
