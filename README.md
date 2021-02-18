@@ -216,20 +216,59 @@ network.host: 192.168.125.135
 
 ##### 1.8安装Head插件
 
-1.安装nodejs
+Head是elasticsearch的集群管理工具，可以用于数据的浏览和查询.
+
+(1)elasticsearch-head是一款开源软件，被托管在github上面，所以如果我们要使用它，必须先安装git，通过git获取elasticsearch-head
+
+(2)运行elasticsearch-head会用到grunt，而grunt需要npm包管理器，所以nodejs是必须要安装的
+
+(3)elasticsearch5.0之后，elasticsearch-head不做为插件放在其plugins目录下了。使用git拷贝elasticsearch-head到本地
+
+1. 编译并安装git :   下载：git-2.17.0.tar.gz
 
 ```
-# cd /app
 
-# wget https://nodejs.org/dist/v10.9.0/node-v10.9.0-linux-x64.tar.gz
+tar -xvf git-2.17.0.tar.gz
 
-# tar xf node-v10.9.0-linux-x64.tar.gz
+cd git-2.17.0
 
-# mv node-v10.9.0-linux-x64 nodejs
+执行如下命令：编译并指定安装目录进行安装
 
-# ln -s /app/nodejs/bin/node /usr/bin/node
+[root@cib129 git-2.17.0]# ./configure --prefix=/usr/local/git-2.17.0 && make install
 
-# ln -s /app/nodejs/bin/npm /usr/bin/npm
+[root@cib129 git-2.17.0]# vi /etc/profile  在最后添加如下环境变量：
+
+export PATH=$PATH:/usr/local/git-2.17.0/bin
+
+[root@cib129 git-2.17.0]# source /etc/profile
+
+查看版本号：[root@cib129 git-2.17.0]#  git --version
+```
+
+ 安装成功后删除git的解压目录：[root@cib129 hadoop]# rm -rf git-2.17.0 
+
+2.安装nodejs  下载 （node-v10.0.0-linux-x64.tar.xz） 
+
+```
+[root@cib129 hadoop]# xz -d node-v10.0.0-linux-x64.tar.xz
+
+[root@cib129 hadoop]# tar -xvf node-v10.0.0-linux-x64.tar
+
+[root@cib129 hadoop]# mv node-v10.0.0-linux-x64 /usr/local/node
+
+[root@cib129 node]# vi /etc/profile
+
+在尾部添加export PATH=$PATH:/usr/local/node/bin
+
+[root@cib129 node]# source /etc/profile
+
+查看nodejs的版本： [root@cib129 node]# node -v
+
+查看npm的版本:  [root@cib129 node]# npm -v
+
+安装cnpm:   因为npm安装依赖包太慢（都是国外的），所以使用淘宝的镜像吧，安装cnpm
+
+[root@cib129 node]# npm install -g cnpm --registry=https://registry.npm.taobao.org
 
 ```
 
