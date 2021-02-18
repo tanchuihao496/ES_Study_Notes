@@ -198,7 +198,7 @@ $ vim /app/elasticsearch-6.2.4/config/elasticsearch.yml
 network.host: 192.168.125.135
 ```
 
-![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/ES_Remote_access_test_diagram.png.png)
+![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/ES_Remote_access_test_diagram.png)
 
 （6）安装ElasticSearch-head插件
 
