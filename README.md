@@ -206,15 +206,15 @@ network.host: 192.168.125.135
 
 
 
+##### 1.7安装中文分词器
 
+下载中文分词器 https://github.com/medcl/elasticsearch-analysis-ik
 
 ##### 
 
+#### P4
 
-
-
-
-（6）安装ElasticSearch-head插件
+##### 1.8安装Head插件
 
 1.安装nodejs
 
