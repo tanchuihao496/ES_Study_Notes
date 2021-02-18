@@ -60,7 +60,7 @@ ElasticSearch是基于Lucene开发的分布式搜索框架，包含如下特性�
 4. 支持Restful 风格接口。
 5. 配置简单等
 
-### P2
+#### P2
 
 ##### 1.4RESTfull API
 
@@ -98,7 +98,7 @@ curl -v www.baidu.com
 
 curl -Ｘ GET/POST/PUT/DETELE url
 
-### P3
+#### P3
 
 ##### 1.6CentOS7下安装ELasticSearch6.2.4
 
@@ -144,15 +144,17 @@ export PATH=$JAVA_HOME/bin:$PATH
 ```
 # vim /etc/security/limits.conf
 
+*为ES用户
+
 添加：
 
-*soft nofile 65536
+* soft nofile 65536
 
-*hard nofile 65536
+* hard nofile 65536
 
-*soft nproc 4096
+* soft nproc 4096
 
-*hard nproc 4096
+* hard nproc 4096
 
 ```
 
@@ -188,7 +190,9 @@ $ curl 127.0.0.1:9200
 
 ```
 
-**如果要实现远程访问：**
+#### P4
+
+如果要实现远程访问：**
 
 修改配置文件elasticsearch.yml的配置项network.host,然后重启elasticsearch：
 
@@ -199,6 +203,16 @@ network.host: 192.168.125.135
 ```
 
 ![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/ES_Remote_access_test_diagram.png)
+
+
+
+
+
+##### 
+
+
+
+
 
 （6）安装ElasticSearch-head插件
 
