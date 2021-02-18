@@ -286,5 +286,5 @@ export PATH=$PATH:/usr/local/git-2.17.0/bin
 
 [root@cib129 local]# git clone git://github.com/mobz/elasticsearch-head.git
 
- ![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/Head_install_cnpm_copy.png) 
+ ![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/Head_install_copy.png) 
 
