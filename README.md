@@ -423,3 +423,9 @@ curl -X PUT "localhost:9200/user/_doc/1" -H 'Content-Type: application/json' -d
 上面的例子，Elasticsearch建立的索引大致如下： 
 
 ![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/eg_user_index.png)
+
+Elasticsearch分别为每个字段都建立了一个倒排索引。比如，在上面“张三”、“北京市”、22 这些都是Term，而[1，3]就是Posting List。Posting list就是一个数组，存储了所有符合某个Term的文档ID。
+
+只要知道文档ID，就能快速找到文档
+
+参考：https://www.cnblogs.com/sha0830/p/8000242.html
