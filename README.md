@@ -198,7 +198,7 @@ $ vim /app/elasticsearch-6.2.4/config/elasticsearch.yml
 network.host: 192.168.125.135
 ```
 
-![1613613152437](C:\Users\tanchuihao\AppData\Roaming\Typora\typora-user-images\1613613152437.png)
+![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/ES_Remote_access_test_diagram.png.png)
 
 （6）安装ElasticSearch-head插件
 
