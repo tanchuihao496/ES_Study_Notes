@@ -4,7 +4,9 @@
 
 #### P1
 
-##### 1.1ElasticSearch是一个基于Lucene的搜索服务器。它提供了一个分布式多用户能力的全文搜索引擎，基于RESTfulweb接口。ElasticSearch是用Java开发的，并作为Apache许可条款下的开放源码发布，是当前流行的企业级搜索引擎。设计用于云计算中，能够达到实时搜索，稳定，可靠，快速，安装使用方便。构建在全文检索开源软件Lucene之上的Elasticsearch，不仅能对海量规模的数据完成分布式索引与检索，还能提供数据聚合分析。据国际权威的数据库产品评测机构DB Engines的统计，在2016年1月，Elasticsearch已超过Solr等，成为排名第一的搜索引擎类应用
+##### 1.1ElasticSearch是什么？
+
+ElasticSearch是一个基于Lucene的搜索服务器。它提供了一个分布式多用户能力的全文搜索引擎，基于RESTfulweb接口。ElasticSearch是用Java开发的，并作为Apache许可条款下的开放源码发布，是当前流行的企业级搜索引擎。设计用于云计算中，能够达到实时搜索，稳定，可靠，快速，安装使用方便。构建在全文检索开源软件Lucene之上的Elasticsearch，不仅能对海量规模的数据完成分布式索引与检索，还能提供数据聚合分析。据国际权威的数据库产品评测机构DB Engines的统计，在2016年1月，Elasticsearch已超过Solr等，成为排名第一的搜索引擎类应用
 
 概括:基于Restful标准的高扩展高可用的实时数招分析的全文搜索工具
 
@@ -345,7 +347,7 @@ vim app.js
 
 #### P6
 
-###### 1.8安装kibana
+##### 1.9安装kibana
 
 Kibana是一个针对Elasticsearch的开源分析及可视化平台，使用Kibana可以查询、查看并与存储在ES索引的数据进行交互操作，使用Kibana能执行高级的数据分析，并能以图表、表格和地图的形式查看数据
 
@@ -429,3 +431,9 @@ Elasticsearch分别为每个字段都建立了一个倒排索引。比如，在�
 只要知道文档ID，就能快速找到文档
 
 参考：https://www.cnblogs.com/sha0830/p/8000242.html
+
+
+
+##### P8
+
+#### 2.2使用ElasticSearch API实现CRUD
