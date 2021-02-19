@@ -748,6 +748,8 @@ POST /lib/user/1/_update
 
 使用Multi Get API可以通过索引名、类型名、文档id一次得到一个文档集合，文档可以来自同一个索引库，也可以来自不同索引库
 
+![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/multi_get_api.png)
+
 使用curl命令：
 
 curl 'http://192.168.25.131:9200/_mget' -d '{
