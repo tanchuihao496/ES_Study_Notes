@@ -748,14 +748,16 @@ POST /lib/user/1/_update
 
 使用Multi Get API可以通过索引名、类型名、文档id一次得到一个文档集合，文档可以来自同一个索引库，也可以来自不同索引库
 
+Multi Get API官方地址：https://www.elastic.co/guide/en/elasticsearch/client/java-api/6.2/java-docs-multi-get.html
+
 ![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/multi_get_api.png)
 
 1.通过一个ID获得
 2.或通过具有相同索引/类型的ID列表
 3.你也可以从另一个索引
 4.遍历结果集
-5.您可以检查文件是否存在
-6.进入_source现场
+5.您可以检查文档是否存在
+6.访问_source字段
 
 
 
