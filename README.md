@@ -750,6 +750,15 @@ POST /lib/user/1/_update
 
 ![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/multi_get_api.png)
 
+1.通过一个ID获得
+2.或通过具有相同索引/类型的ID列表
+3.你也可以从另一个索引
+4.遍历结果集
+5.您可以检查文件是否存在
+6.进入_source现场
+
+
+
 使用curl命令：
 
 curl 'http://192.168.25.131:9200/_mget' -d '{
