@@ -860,11 +860,17 @@ POST /lib2/books/_bulk
 {"title":"Php","price":35}
 ```
 
+bulk一次最大处理多少数据量：
+
+bulk会把将要处理的数据载入内存中，所以数据量是有限制的，最佳的数据量不是一个确定的数值，它取决于你的硬件，你的文档大小以及复杂性，你的索引一般建议是1000-5000个文档，大小建议是5-15MB，默认不能超过100M，可以再es的配置文件（即$ES_HOME下的config下的elasticsearch.yml）中。
 
 
 
 
-2.2.2版本控制
+
+#### P14
+
+##### 2.5版本控制
 
 ElasticSearch采用了乐观锁来保证数据的一致性，也就是说，当用户对document进行操作时，并不需要对该document作加锁和解锁的操作，只需要指定要操作的版本即可，当版本号一致时，ElasticSearch会允许该操作顺利执行，而当版本号存在冲突时，ElasticSearch会提示冲突并抛出异常（VersionConflictEngineException异常）。
 
@@ -876,7 +882,13 @@ ElasticSearch的版本号的取值范围为1到2^63 - 1。
 
 为了保持_version与外部版本控制的数据一致，使用version_type = external。
 
-2.2.3实现映射mapping
+
+
+
+
+#### P15
+
+##### 2.6实现映射mapping
 
 ![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/CRUD_mapping.png)
 
