@@ -559,3 +559,318 @@ ik安装完毕后配置文件在 {ES_HOME}/config目录下, 本例目录是 /opt
 #### P11
 
 ##### 2.2使用ElasticSearch API实现CRUD
+
+2.2.1CRUD操作
+
+ 添加索引： 
+
+```
+# ib是索引名
+PUT /lib/ 
+{
+  "settings":{
+	 "index":{
+		"number_of_shards": 5, # 分片数
+		"number_of_replicas": 1 # 副本数
+	 }
+  }
+}
+
+# 这样创建的索引配置信息将是默认的
+PUT lib2
+
+# 返回结果
+{
+  "acknowledged": true,
+  "shards_acknowledged": true,
+  "index": "lib"
+}
+```
+
+ 查看索引的配置信息  
+
+```
+GET /lib/_settings
+
+# 返回结果
+{
+  "lib":{
+	 "settings":{
+		"creation_date": "1525922783367",
+		"number_of_shards": 5,
+		"number_of_replicas": 1,
+		"uuid": "ICnRur_NTn2s9sM04XE_rQ",
+		"version": {
+		   "created": "6020499"
+		},
+		"provided_name": "lib"
+	 }
+  }
+}
+
+# 查看所有索引的配置
+GET _all/_setings
+```
+
+ 添加文档 
+
+```
+# 分别为索引:_index、类型:_type、Id:_id,
+# id不设置将会自动生成一个随机且唯一的字符串作为该文档的id（需要使用POST请求）
+PUT /lib/user/1  
+{
+  "frist_name": "Jane",
+  "last_name": "Smith",
+  "age": 32,
+  "about": "I like to collect rock albums",
+  "interests": ["music"]
+}
+
+# 返回结果
+{
+  "_index": "lib",
+  "_type": "user",
+  "_id": "1",
+  "_version": 1,
+  "result": "created", # 返回请求结果
+  "_shards": {
+	 "total": 1,
+	 "successful": 1,
+	 "failed": 0
+  },
+  "_seq_no": 0,
+  "_primary_trem": 1
+}
+```
+
+ 查看文档 
+
+```
+# 查看文档
+GET /lib/user/1
+
+# 返回结果
+{
+  "_index": "lib",
+  "_type": "user",
+  "_id": "1",
+  "_version": 1,
+  "found": true,
+  "_source": {
+	 "frist_name": "Jane",
+	 "last_name": "Smith",
+	 "age": 32,
+	 "about": "I like to collect rock albums",
+	 "interests": [
+		"music"
+	 ]
+  }
+}
+
+# 查看部分字段
+GET /lib/user/1?_source=age,about
+
+# 返回结果
+{
+  "_index": "lib",
+  "_type": "user",
+  "_id": "1",
+  "_version": 1,
+  "found": true,
+  "_source": { 
+	 "about": "I like to collect rock albums",
+	 "age": 32
+  }
+}
+```
+
+ 更新文档 
+
+```
+# 覆盖式修改PUT
+PUT /lib/user/1  
+{
+  "frist_name": "Jane",
+  "last_name": "Smith",
+  "age": 36, # 原本的age是32
+  "about": "I like to collect rock albums",
+  "interests": ["music"]
+}
+
+# 返回结果
+{
+  "_index": "lib",
+  "_type": "user",
+  "_id": "1",
+  "_version": 2, # 更新版本发生了改变
+  "result": "updated", # 返回请求结果发生了改变
+  "_shards": {
+	 "total": 1,
+	 "successful": 1,
+	 "failed": 0
+  },
+  "_seq_no": 1, //
+  "_primary_trem": 1
+}
+
+# 直接更新
+POST /lib/user/1/_update
+{
+  "doc":{
+	 "age": 30
+  }
+}
+
+# 返回结果
+{
+  "_index": "lib",
+  "_type": "user",
+  "_id": "1",
+  "_version": 3, # 更新版本再次发生了改变
+  "result": "updated", # 返回请求结果依然为updated
+  "_shards": {
+	 "total": 1,
+	 "successful": 1,
+	 "failed": 0
+  },
+  "_seq_no": 2,
+  "_primary_trem": 1
+}
+```
+
+
+
+#### P12
+
+##### 2.3.批量获取文档
+
+使用es提供的Multi Get API：
+
+使用Multi Get API可以通过索引名、类型名、文档id一次得到一个文档集合，文档可以来自同一个索引库，也可以来自不同索引库
+
+使用curl命令：
+
+curl 'http://192.168.25.131:9200/_mget' -d '{
+
+"docs":[
+
+{
+
+```
+"_index":"lib",
+"_type":"user",
+"_id":1
+```
+
+},{
+
+```
+"_index":"lib",
+"_type":"user",
+"_id":2
+```
+
+}
+
+]
+
+}'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2.2.2版本控制
+
+ElasticSearch采用了乐观锁来保证数据的一致性，也就是说，当用户对document进行操作时，并不需要对该document作加锁和解锁的操作，只需要指定要操作的版本即可，当版本号一致时，ElasticSearch会允许该操作顺利执行，而当版本号存在冲突时，ElasticSearch会提示冲突并抛出异常（VersionConflictEngineException异常）。
+
+ElasticSearch的版本号的取值范围为1到2^63 - 1。
+
+内部版本控制：使用的是 _version
+
+外部版本控制：ElasticSearch在处理外部版本号时会与内部版本号的处理有些不同。它不再是检查_version是否与请求中指定的数值相同，而检查当前的_version是否比指定的数值小，如果请求成功，那么外部的版本号就会被存储到文档中_versionz中。
+
+为了保持_version与外部版本控制的数据一致，使用version_type = external。
+
+2.2.3实现映射mapping
+
+![Image text](https://github.com/tanchuihao496/ES_Study_Notes/blob/master/img/CRUD_mapping.png)
+
+ 创建索引的时候，可以预先定义字段的类型以及相关属性，这样就能够把日期字段处理成日期，把数字字段处理成数字，把字符串字段处理字符串值等支持的数据类型： 
+
+ （1）核心数据类型（Code datatypes） 
+
+```
+
+字符型：string，string类型包括
+ 
+text和keyword
+ 
+text类型被用来索引长文本，在建立索引前会将这些文本进行分词，转化为词的组合，建立索引，允许es来检索这些词语。text类型不能用来排序和聚合。
+ 
+keyword 类型不需要进行分词，可以被用来检索过滤、排序和聚合。keyword类型字段只能用本身来进行检索。
+ 
+数字型：long，integer，short，byte，double，float
+ 
+日期型：date
+ 
+布尔型：boolean
+ 
+二进制型：binary
+```
+
+ （2）复杂数据类型（Complex dataypes） 
+
+```
+数组类型（Array datatype）；数组类型不需要专门制定数组元素的type，例如：
+ 
+字符型数组：["one","two"]
+ 
+整数数组：[1,2]
+ 
+数组型整数：[1,[2,3]] 等价于 [1,2,3]
+ 
+对象数组：[{"name": "Mary", "age":12},{"name" : "john" , "age" : 10}]
+ 
+对象类型（Object datatype）：_object_ 用于单个JSON对象；
+ 
+嵌套类型（Nested datatype）：_nested_用于JSON数组；
+```
+
+ （3）地理位置类型（Geo datatypes） 
+
+```
+地理坐标类型（Geo-point datatype）：_geo_point_ 用于经纬度坐标；
+ 
+地理形状类型（Geo-Shape datatype）：_geo_shape_ 用于类似于多边形的复杂形状；
+```
+
+ （4）特定类型（Specialised datatype） 
+
+```
+
+IPv4类型（IPv4 datatype）：_ip_ 用于IPv4地址；
+ 
+Completion类型（Completion datatype）：_ completion _ 提供自动补全建议；
+ 
+Token count类型（Token count datatype）：_ token _ count _ 用于统计做了标记的字段的index数目，该值会一直增加，不会因为过滤条件而减少。mapper-murmur3
+ 
+类型：通过插件，可以通过 _ murmur3 _ 来计算index的hash值；
+ 
+附加类型（Attachment datatype）：采用mapper-attachments
+ 
+插件，可支持 _ attachments _ 索引
+```
+
+ 支持的属性： 
+
