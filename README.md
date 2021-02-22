@@ -1,5 +1,5 @@
 ++++++++搜索引擎ElasticSearch学习笔记++++++++
-注意：Github README文件编辑方法以及解决无法显示图片问题
+\n注意：Github README文件编辑方法以及解决无法显示图片问题
 
 修改hosts文件添加一下内容（C:\Windows\System32\drivers\etc\hosts）
 
