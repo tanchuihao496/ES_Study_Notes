@@ -895,7 +895,7 @@ ElasticSearch的版本号的取值范围为1到2^63 - 1。
 
 为了保持_version与外部版本控制的数据一致，使用version_type = external。
 
-###### 1、内部版本控制：
+**1、内部版本控制：**
 
  （1）使用的是_version 版本号要与文档的版本号一致 
 
@@ -1227,7 +1227,7 @@ PUT company/employee/1
 
 
 
-#### P17 P18 P19
+#### P17-P18-P19
 
 ##### 2.7基本查询（Query查询）
 
@@ -1351,3 +1351,149 @@ GET /lib3/user/_search
 
 }
 
+**2.7.8排序**
+
+使用sort实现排序：desc降序，asc升序
+
+```
+GET /lib3/user/_search {"query":{"match_all":{}},"sort":[{"age":{"order ":"asc"}}]}
+```
+
+```
+GET /lib3/user/_search {"query":{"match_all":{}},"sort":[{"age":{"order ":"desc"}}]}
+```
+
+**2.7.9前缀匹配查询**
+
+```
+GET /lib3/user/_search {"query":{"match_phrase_prefix":{"name":{"query":"赵"}}}}
+```
+
+**2.7.10范围查询**
+
+range：实现范围查询
+
+参数：from，to，include_lower，include_upper，boost
+
+include_lower：是否包含范围左边界，默认是true
+
+include_upper：是否包含范围右边界，默认是true
+
+```
+GET /lib3/user/_search {"query":{"range":{"birthday":{"from":"1990-10-10","to":"2018-05-01"}}}}
+```
+
+```
+GET /lib3/user/_search {"query":{"range":{"age":{"from":20,"to":25,"include_lower":true,"include_upper":false}}}}
+```
+
+**2.7.11wildcard查询**
+
+```
+允许使用通配符*和?来进行查询
+*代表0个或多个字符
+?代表任意一个字符
+GET /lib3/user/_search {"query":{"wildcard":{"name":"赵*"}}}
+GET /lib3/user/_search {"query":{"wildcard":{"name":"li?i"}}}
+
+```
+
+**2.7.12fuzzy实现模糊查询**
+
+value：查询的关键字
+
+boost：查询的权值，默认值是1.0
+
+min_similarity：设置匹配的最小相似度，默认值头0.5，对于字符串，取值为0-1(包括0和1);对于数值，取值可能大于1；对于日期型取值为1d,1m等，1d就代表1天
+
+prefix_length：指明区分词项的共同前缀长度，默认是0
+
+max_expansions：查询中的词项可以扩展的数目，默认可以无限大
+
+```
+GET /lib3/user/_search {"query":{"fuzzy":{"interests":"唱歌"}}}
+```
+
+```
+GET /lib3/user/_search {"query":{"fuzzy":{"interests":{"value":"喝酒"}}}}
+```
+
+
+
+
+
+#### P20
+
+##### 2.8Filter查询
+
+filter是不计算相关性的，同时可以cache。因此，filter速度要快于query。
+
+```
+POST /lib4/items/_bulk {"index":{"_id":1}}
+{"price":40,"itemID":"ID100123"}
+{"index":{"_id":2}}
+{"price":50,"itemID":"ID100124"}
+{"index":{"_id":3}}
+{"price":25,"itemID":"ID100124"}
+{"index":{"_id":4}}
+{"price":30,"itemID":"ID100125"}
+{"index":{"_id":5}}
+{"price":null,"itemID":"ID100127"}
+```
+
+**2.8.1简单的过滤查询**
+
+```
+GET /lib4/items/_search {"post_filter":{"item":{"price":40}}}
+GET /lib4/items/_search {"post_filter":{"item":{"price":[25,40]}}}
+GET /lib4/items/_search {"post_filter":{"item":{"itemID":"ID100123"}}}
+```
+
+查询分词器分析的结果：
+
+```
+GET /lib4/_mapping
+```
+
+不希望商品id字段被分词，则重新创建映射
+
+```
+DELETE /lib4
+```
+
+```
+PUT /lib4 {"mapping":{"items":{"properties":{"itemID":{"type":"text","index":false}}}}}
+```
+
+**2.8.2bool过滤查询**
+
+可以实现组合过滤查询
+
+格式：
+
+```
+{"bool":{"must":[],"should":[],"must_not":[]}}
+```
+
+must：必须满足的条件---and
+
+should：可以满足也可以不满足的条件---or
+
+must_not：不需要满足的条件--not
+
+GET /lib4/items/_search {"post_filter":{"bool":{"should":[{"term":{"price":25}},{"term":{"itemID":"ID100123"}}
+
+```
+			],
+			"must_not": {
+				"term": {
+					"price": 30
+				}
+			}
+		}
+	}
+```
+
+}
+
+嵌套使用bool：
