@@ -1337,6 +1337,7 @@ GET /lib3/user/_search
 使用通配符*
 
 GET /lib3/user/_search 
+
 {
 	"_source": {
 		"includes": "addr*",
@@ -1497,3 +1498,10 @@ GET /lib4/items/_search {"post_filter":{"bool":{"should":[{"term":{"price":25}},
 }
 
 嵌套使用bool：
+
+```
+GET /lib4/items/_search {"post_filter":{"bool":{"should":[{"term":{"itemID":"id100123"}},{"bool":{"must":[{"term":{"itemID":"id100124"}},{"item":{"price":40}}]}}]}}}
+```
+
+**2.8.3范围过滤**
+
