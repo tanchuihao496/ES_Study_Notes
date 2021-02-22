@@ -1326,8 +1326,7 @@ GET /lib3/user/_search
 	},
 
 ```
-
-	"_source": {
+ 	"_source": {
 		"includes": ["name", "address"],
 		"excludes": ["age", "birthday"]
 	}
