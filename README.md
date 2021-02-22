@@ -1075,7 +1075,7 @@ Token count类型（Token count datatype）：_ token _ count _ 用于统计做�
 
 #### P16
 
-##### 2.7Object数据类型及手动创建mapping
+##### 2.6.1Object数据类型及手动创建mapping
 
  **1.multivalue field** 
 
@@ -1227,5 +1227,88 @@ PUT company/employee/1
 
 
 
+#### P17
 
+##### 2.7基本查询（Query查询）
 
+**2.7.1数据准备**
+
+```
+PUT /ib3 
+{"settings":{"number_of shards":3,"number of replicas ":0},"mappings":{"user":{"properties":{"name":{"type":"text"},"address":{"type":"text "},"age":{"type ":"integer "},"interests ":{"type ":"text"},"birthday":{"type":"date"}}}}}
+```
+
+```
+GET /lib3/user/_search?q=name:lisi
+```
+
+```
+GET /lib3/user/_search?q=name:zhaoliu&sort=age:desc
+```
+
+**2.7.2term查询和terms查询**
+
+term query会去倒排索引中寻找确切的term，它并不知遵分词器的存在。这种查询适合keyword , numeric、date.
+
+term：查询某个字段里含有某个关键词的文档
+
+```
+GET /lib3/user/_search/ {" query":{"term":{"interests":"changge"}}}
+```
+
+terms：查询某个字段里含有多个关键词的文档
+
+```
+GET /lib3/user/_search {"query":{"terms":{"interests":["hejiu","changge"]}}}
+```
+
+**2.7.3控制查询返回的数量**
+
+from：从哪一个文档开始 
+
+size：需要的个数
+
+```
+GET /lib3/user/_search {"from":0,"size":2,query":{"terms":{"interests":["hejiu","changge"]}}}
+```
+
+**2.7.4返回版本号**
+
+```
+GET /lib3/user/_serarch {"version":true,query":{"terms":{"interests":["hejiu","changge"]}}}
+```
+
+**2.7.5match查询**
+
+match query知道分词器的存在，会对filed进行分词操作，然后再查询
+
+```
+GET /lib3/user/_search {"query":{"match":{"name":"zhaoliu"}}}
+```
+
+```
+GET /lib3/user/_search {"query":{"match":{"age":20}}}
+```
+
+match_all：查询所有文档
+
+```
+GET /lib3/user/_search {"query":{"match_all":{}}}
+```
+
+multi_match：可以指定多个字段
+
+```
+GET /lib3/user/_search {"query":{"multi_match":{"query":"lvyou","fields":["interests":"name"]}}}
+```
+
+match_phrase：短语匹配查询
+
+ElasticSearch引擎首先分析（analyze）查询字符串，从分析后的文本中构建短语查询，这意味着必须匹配短语中的所有分词，并且保证各个分词的相对位置不变：
+
+```
+GET lib3/user/_search
+{"query":{"match_phrase":{"interests":"duanlian,shouxiangsheng"}}}
+```
+
+**2.7.6指定返回的字段**
