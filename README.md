@@ -1067,3 +1067,165 @@ Token count类型（Token count datatype）：_ token _ count _ 用于统计做�
     # 对快速高亮fast vector highlighter能提升性能，但开启又会加大索引体积，不适合大数据量用
 ```
 
+
+
+
+
+
+
+#### P16
+
+##### 2.7Object数据类型及手动创建mapping
+
+ **1.multivalue field** 
+
+```
+PUT my_index/my_type/1
+{
+  "tags":[
+    "tag1","tag2"
+    ]
+}
+```
+
+建立索引与string是一样的，数据类型不能混。
+
+**2、empty field**
+null , [] , [null]
+
+**3、object field**
+
+```
+PUT company/employee/1
+{
+  "adress":{
+    "country":"China",
+    "province":"shanghai",
+    "city":"shanghai"
+  },
+  "name":"jack",
+  "age":27,
+  "join_work":"2019-09-01"
+}
+```
+
+ 运行结果 
+
+```
+{
+  "_index": "company",
+  "_type": "employee",
+  "_id": "1",
+  "_version": 1,
+  "result": "created",
+  "_shards": {
+    "total": 2,
+    "successful": 1,
+    "failed": 0
+  },
+  "_seq_no": 0,
+  "_primary_term": 1
+}
+```
+
+ 查看es自动建立的mapping 
+
+```
+{
+  "company": {
+    "mappings": {
+      "employee": {
+        "properties": {
+          "adress": {
+            "properties": {
+              "city": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "country": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              },
+              "province": {
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                  }
+                }
+              }
+            }
+          },
+          "age": {
+            "type": "long"
+          },
+          "join_work": {
+            "type": "date"
+          },
+          "name": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+ **在object类型在 es 底层会变成这样** 
+
+```
+{
+    "name":[jack],
+    "age":[27],
+    "join_work":[2019-09-01],
+    "address.country":[China],
+    "address.province":[shanghai],
+    "address.city":[shanghai]
+}
+```
+
+ **如果我们的数据是数组包含对象** 
+
+```
+{
+    "authors":[
+       {"name":"jack","age":27},
+       {"name":"Tom","age":28},
+       {"name":"Lily","age":28}
+    ]
+}
+```
+
+ **es底层会将其转化成下面的格式(横式变成列式存储)** 
+
+```
+{
+    "authors.name":[jack,Tom,Lily],
+    "authors.age":[27,28,28]
+}
+```
+
+
+
+
+
+
+
