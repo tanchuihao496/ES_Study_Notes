@@ -1331,10 +1331,9 @@ GET /lib3/user/_search
 		"includes": ["name", "address"],
 		"excludes": ["age", "birthday"]
 	}
-}
 ```
 
-
+}
 
 使用通配符*
 
@@ -1343,13 +1342,13 @@ GET /lib3/user/_search
 	"_source": {
 		"includes": "addr*",
 		"excludes": ["name", "bir*"]
-	},
 
 ```
-
+	},
 	"query": {
 		"match_all": {}
 	}
-}
 ```
+
+}
 
