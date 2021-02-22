@@ -986,7 +986,7 @@ Token count类型（Token count datatype）：_ token _ count _ 用于统计做�
  支持的属性： 
 
 ```
-"type" : "text", #是数据类型一般文本使用text(可分词进行模糊查询)；keyword无法被分词(不需要执行分词器)，用于精确查找
+	"type" : "text", #是数据类型一般文本使用text(可分词进行模糊查询)；keyword无法被分词(不需要执行分词器)，用于精确查找
 
     "analyzer" : "ik_max_word", #指定分词器，一般使用最大分词：ik_max_word
 
