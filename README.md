@@ -1227,7 +1227,7 @@ PUT company/employee/1
 
 
 
-#### P17
+#### P17 P18 P19
 
 ##### 2.7基本查询（Query查询）
 
@@ -1312,3 +1312,44 @@ GET lib3/user/_search
 ```
 
 **2.7.6指定返回的字段**
+
+```
+GET /lib3/userl_search {"_source":{"address":"name"}," query ":{"match ":{"interests ":"唱歌”"}}}
+```
+
+**2.7.7控制加载的字段**
+
+GET /lib3/user/_search 
+{
+	"query": {
+		"match_all": {}
+	},
+
+```
+
+	"_source": {
+		"includes": ["name", "address"],
+		"excludes": ["age", "birthday"]
+	}
+}
+```
+
+
+
+使用通配符*
+
+GET /lib3/user/_search 
+{
+	"_source": {
+		"includes": "addr*",
+		"excludes": ["name", "bir*"]
+	},
+
+```
+
+	"query": {
+		"match_all": {}
+	}
+}
+```
+
