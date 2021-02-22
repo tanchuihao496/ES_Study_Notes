@@ -1505,3 +1505,36 @@ GET /lib4/items/_search {"post_filter":{"bool":{"should":[{"term":{"itemID":"id1
 
 **2.8.3范围过滤**
 
+gt：>
+
+lt：<
+
+gte：>=
+
+lte：<=
+
+```
+GET/lib4/items/_search {"post_filter":{"range":{"price":{"gt":25,"lt ":50}}}}
+```
+
+**2.8.4过滤非空**
+
+```
+GET/lib4/items/_search {"query":{"bool":{"filter":{"exists":{"field":"price"}}}}}
+GET/lib4/items/_search {"query":{"constant_score":{"filter":{"exists":{"field":"price"}}}}}
+```
+
+**2.8.5过滤器缓存**
+
+ElasticSearch提供了一种特殊的缓存，即过滤器缓存（filter cache)，用来存储过滤器的结果，被缓存的过滤器并不需要消耗过多的内存(因为它们只存储了哪些文档能与过滤器相匹配的相关信息)，而且可供后续所有与之相关的查询重复使用，从而极大地提高了查询性能。
+
+注意:ElasticSearch并不是默认缓存所有过滤器，以下过滤器默认不缓存:
+
+
+
+#### P21
+
+##### 2.9聚合查询
+
+
+
