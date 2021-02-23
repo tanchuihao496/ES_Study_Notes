@@ -1682,3 +1682,86 @@ term查询被放置在constant_score中，转成不评分的filter，这种方�
 ##### 3.1解析es的分布式架构
 
 **3.1.1分布式架构的透明隐藏特性**
+
+ElasticSearch是一个分布式系统，隐藏了复杂的处理机制
+分片机制：我们不用关心数据是按照什么机制分片的、最后放入到哪个分片中
+分片的副本：
+集群发现机制(cluster discovery):比如当前我们启动了一个es进程，当启动了第二个es进程时，这个进程作为一个node自动就发现了集群，并且加入了进去。
+shard负载均衡：比如现在有10shard，集群中有3个节点，es会进行均衡的进行分配，以保持每个节点均衡的负载请求。
+请求路由
+
+
+
+**3.1.2扩容机制**
+
+垂直扩容：购置新的机器，替换已有的机器
+水平扩容：直接增加机器
+
+**3.2.3rebalance**
+
+增加或减少节点时会自动均衡
+
+**3.1.4master节点**
+
+主节点的主要职责是和集群操作相关的内容，如创建或删除索引，跟踪哪些节点是群集的一部分，并决定哪些分片分配给相关的节点。稳定的主节点对集群的健康是非常重要的。
+
+**3.1.5节点对等**
+
+每个节点都能接收请求每个节点接收到请求后都能把该请求路由到有相关数据的其它节点上接收原始请求的节点负责采集数据并返回给客户端
+
+
+
+
+
+#### P24
+
+##### 3.2分片和副本机制
+
+1.index包含多个shard
+
+2.每个shard都是一个最小工作单元，承载部分数据；每个shard都是一个lucene实例，有完整的建立索引和处理请求的能力
+
+3.增减节点时，shard会自动在nodes中负载均衡
+
+4.primary shard和replica shard，每个document肯定只会存在于某一个primary shard以及其对应的replica shard中，不可能存在于多个primary shard
+
+5.replica shard是primary shard的副本，负责容错，以及承担读请求负载
+
+6.primary shard的数量在创建索引的时候就固定了，replica shard的数量可以随时修改
+
+7.primary shard的默认数量是5，replica默认是1，默认有10个shard，5个primary shard，5个replica shard
+
+
+
+##### 3.3单节点环境下创建索引分析
+
+PUT /myindex { "settings" : { "number_of_shards": 3, "number_of_replicas" : 1}}
+
+这个时候，只会将3个primary shard分配到仅有的一个node上去，另外3个replica shard是无法分配的（一个shard的副本replica，他们两个是不能在同一个节点的)。集群可以正常工作，但是一旦出现节点宕机，数据全部丢失，而且集群不可用，无法接收任何请求。
+
+
+
+##### 3.4两个节点环境下创建索引分析
+
+将3个primary shard分配到一个node上去，另外3个replica shard分配到另一个节点上
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
