@@ -1528,7 +1528,42 @@ GET/lib4/items/_search {"query":{"constant_score":{"filter":{"exists":{"field":"
 
 ElasticSearch提供了一种特殊的缓存，即过滤器缓存（filter cache)，用来存储过滤器的结果，被缓存的过滤器并不需要消耗过多的内存(因为它们只存储了哪些文档能与过滤器相匹配的相关信息)，而且可供后续所有与之相关的查询重复使用，从而极大地提高了查询性能。
 
-注意:ElasticSearch并不是默认缓存所有过滤器，以下过滤器默认不缓存:
+ 官网地址：https://www.elastic.co/guide/en/elasticsearch/reference/current/query-cache.html 
+
+上面描述的以及之前讨论过的的可以简单把Query Cache总结为以下几点
+
+\1.  Query Cache是节点级别的，每个节点上的所有分片共享一份缓存
+
+\2.  Query Cache采用LRU缓存失效策略
+
+\3.  Query Cache只能在Filter Context中被使用
+
+\4.  Query Cache可以通过 indices.queries.cache.size来设置缓存占用大小，默认10%，可手动设置比如512mb
+
+\5.  Query Cache实际缓存的是Bitset（位图），一个Query clause对应一个Bitset
+
+\6.  缓存要生效，必须满足两个条件
+
+​    a）查询对应的segments所持有的文档数必须大于10000
+
+​    b）查询对应的segments所持有的文档数必须大于整个索引size的3%
+
+\7.  当新索引文档时，Query Cache不会重新计算，而是判断索引的文档是否符合缓存对应的Query clause，满足则加入BitSet中
+
+
+
+注意:ElasticSearch并不是默认缓存所有过滤器，以下过滤器默认不缓存：
+
+numeric_range、script、geo_bbox、geo_distance、geo_distance_range、geo_polygon、geo_shape、and、or、not
+
+默认是开启缓存的过滤器：
+exists,missing,range,term,terms
+
+开启方式：在filter查询语句后边加上
+
+```
+"_catch":true
+```
 
 
 
@@ -1536,5 +1571,114 @@ ElasticSearch提供了一种特殊的缓存，即过滤器缓存（filter cache)
 
 ##### 2.9聚合查询
 
+ sum、min、max、avg、cardinality:求基数、terms:分组 
+
+ 以求和为例： 
+
+```
+
+GET /lib4/items/_search
+{
+  "size":0,
+  "aggs": {
+    "price_sum": { //名字自定义
+      "sum": {
+        "field": "price"
+      }
+    }
+  }
+
+```
+
+ 执行结果 
+
+```
+
+{
+  "took": 9,
+  "timed_out": false,
+  "_shards": {
+    "total": 5,
+    "successful": 5,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": 5,
+    "max_score": 0,
+    "hits": []
+  },
+  "aggregations": {
+    "price_sum": {
+      "value": 185
+    }
+  }
+}
+```
 
 
+
+#### P22
+
+##### 2.10复合查询
+
+将多个基本查询组合成单一查询的查询
+
+**2.10.1使用bool查询**
+
+接收以下参数：
+
+must：文档必须匹配这些条件才能被包含进来。
+
+must_not：文档必须不匹配这些条件才能被包含进来。
+
+should：如果满足这些语句中的任意语句，将增加_score，否则，无任何影响。它们主要用于修正每个文档的相关性得分。
+
+filter：filter:必须匹配，但它以不评分、过滤模式来进行。这些语句对评分没有贡献，只是根据过滤标准来排除或包含文档。
+
+filter:必须匹配，但它以不评分、过滤模式来进行。这些语句对评分没有贡献，只是根据过滤标准来排除或包含文档。
+相关性得分是如何组合的。每一个子查询都独自地计算文档的相关性得分。一旦他们的得分被计算出来，bool查询就将这些得分进行合并并且返回一个代表整个布尔操作的得分。
+
+下面的查询用于查找 title字段匹配how to make milions并且不被标识为spam的文档。那些被标识为starred或在2014之后的文档，将比另外那些文档拥有更高的排名。如果两者都满足，那么它排名将更高：
+
+```
+{"bool":{"must":{"match":{"title":"how to make millions"}},"must_not":{"match":{"tag":"spam"}},"should":[{"match":{"tag":"strred"}},{"range":{"date":{"gte":"2014-01-01"}}}]}}
+```
+
+如果没有must 语句，那么至少需要能够匹配其中的一条should 语句。但，如果存在至少一条must语句，则对 should语句的匹配没有要求。如果我们不想因为文档的时间而影响得分，可以用filter语句来重写前面的例子：
+
+```
+{"bool":{"must":{"match":{"title":"how to make millions"}},"must_not":{"match":{"tag":"spam"}},"should":[{"match":{"tag":"strred"}}],"filter":{"range":{"date":{"gte":"2014-01-01"}}}}}
+```
+
+通过将range查询移到 fiter语句中，我们将它转成不评分的查询，将不再影响文档的相关性排名。由于它现在是一个不评分的查询，可以使用各种对flter查询有效的优化手段来提升性能。
+
+bool查词本身也可以被用做不评分的查询。简单地将它放置到filter语句中并在内部构建布尔逻辑：
+
+```
+{"bool":{"must":{"match":{"title":"how to make millions"}},"must_not":{"match":{"tag":"spam"}},"should":[{"match":{"tag":"starred"}}],"filter":{"bool":{"must":[{"range":{"date":{"gte":"2014-01-01"}}},{"range":{"price":{"lte ":"29.99 "}}}],"must_not ":[{"term ":{"category ":"ebooks "}}]}}}}
+```
+
+**2.10.2constant_score查询**
+
+```
+{"constant_score ":{"filter":{"term":{"category":"ebooks"}}}}
+```
+
+term查询被放置在constant_score中，转成不评分的filter，这种方式可以用来取代只有filter语句的bool查询。 
+
+
+
+
+
+
+
+# 第三节 ElasticSearch原理
+
+
+
+#### P23
+
+##### 3.1解析es的分布式架构
+
+**3.1.1分布式架构的透明隐藏特性**
